@@ -2,6 +2,7 @@ import axios from 'axios';
 import "dotenv/config";
 import formData from "form-data";
 import Mailgun from "mailgun.js";
+import schedule from "node-schedule";
 
 // access mailgun account
 const mailgun = new Mailgun(formData);
@@ -73,3 +74,12 @@ const sendEmail = async (posts: Item[]): Promise<void> => {
     .then((res) => console.log("Email sent: ", res))
     .catch((err) => console.error("Error sending email: ", err));
 };
+
+// create a schedule for fetching and sending posts in an email
+const executionSchedule = process.env.SCHEDULE || '*/2 * * * *'
+schedule.scheduleJob(executionSchedule, async () => {
+  console.log('=== fetching posts')
+  const posts: Item[] = await fetchTopHNPosts()
+  console.log('=== sending email')
+  await sendEmail(posts)
+})
