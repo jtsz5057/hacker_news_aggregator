@@ -1,15 +1,4 @@
 import axios from 'axios';
-import "dotenv/config";
-import formData from "form-data";
-import Mailgun from 'mailgun.js';
-
-
-// access mailgun account and api authentication 
-const mailgun = new Mailgun(formData);
-const client = mailgun.client({
-    username: "api",
-    key: process.env.API_KEY as string,
-})
 
 // defines types for items from hacker News API - https://github.com/HackerNews/API
 type ItemType = 'job' | 'story' | 'comment' | 'poll' | 'pollopt'
