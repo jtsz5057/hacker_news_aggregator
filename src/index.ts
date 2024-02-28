@@ -47,7 +47,7 @@ const fetchTopHNPosts = async (): Promise<Item[]> => {
 // fetchTopHNPosts().then((val) => console.log(val))
 
 
-// create send email function 
+// create send email function and email template 
 const sendEmail = async (posts: Item[]): Promise<void> => {
   const html: string = `
   <h1>Top 10 Hacker News Posts with Most Comments</h1>
