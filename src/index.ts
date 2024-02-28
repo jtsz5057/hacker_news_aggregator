@@ -1,4 +1,14 @@
 import axios from 'axios';
+import "dotenv/config";
+import formData from "form-data";
+import Mailgun from "mailgun.js";
+
+// access mailgun account
+const mailgun = new Mailgun(formData);
+const client = mailgun.client({
+  username: "api",
+  key: process.env.API_KEY as string,
+});
 
 // defines types for items from hacker News API - https://github.com/HackerNews/API
 type ItemType = 'job' | 'story' | 'comment' | 'poll' | 'pollopt'
@@ -34,5 +44,32 @@ const fetchTopHNPosts = async (): Promise<Item[]> => {
   }
 
   // test it out
-fetchTopHNPosts().then((val) => console.log(val))
+// fetchTopHNPosts().then((val) => console.log(val))
 
+
+// create send email function 
+const sendEmail = async (posts: Item[]): Promise<void> => {
+  const html: string = `
+  <h1>Top 10 Hacker News Posts with Most Comments</h1>
+  <ul>
+    ${posts
+      .map(
+        (post: Item) =>
+          `<li><a href=${post.url}>${post.title} - ${
+            post.descendants || 0
+          } comments</a></li>`
+      )
+      .join("")}
+  </ul>
+  `;
+  const messageData = {
+    from: `"HN News ☁️" <${process.env.EMAIL}>`,
+    to: [process.env.RECIPIENT_EMAIL as string], // or array of emails
+    subject: "Currently 🔥 on HN",
+    html,
+  };
+  client.messages
+    .create(process.env.DOMAIN as string, messageData)
+    .then((res) => console.log("Email sent: ", res))
+    .catch((err) => console.error("Error sending email: ", err));
+};
